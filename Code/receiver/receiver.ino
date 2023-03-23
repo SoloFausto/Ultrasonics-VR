@@ -46,22 +46,27 @@ unsigned long previousTime2 = 0;
 // Define the speed of the interpolation
 const float SPEED2 = 0.2;
 
+int syncIn = 18;
+int usr1Echo = 2;
+int usr2Echo = 3;
+int Usr1Trig = 7;
+int Usr2Trig = 8;
 void setup() {
-
-  pinMode(2, INPUT);      // US1 echo in
-  pinMode(3, INPUT);      // US2 echo in
-  pinMode(18, INPUT);     // IR trigger in
-  pinMode(7, OUTPUT);     // US1 trigger out
-  pinMode(8, OUTPUT);     // US2 trigger out
+  
+  pinMode(usr1Echo, INPUT);      // Ultrasonic Sensor 1 echo in
+  pinMode(usr2Echo, INPUT);      // Ultrasonic Sensor 2 echo in
+  pinMode(syncIn, INPUT);     // IR trigger in
+  pinMode(Usr1Trig, OUTPUT);     // Ultrasonic Sensor 1 trigger out
+  pinMode(Usr2Trig, OUTPUT);     // Ultrasonic Sensor 2 trigger out
   Serial.begin(115200);
 
   // set the interrupt pin as an input and enable the pull-up resistor
-  pinMode(2, INPUT);
+  pinMode(usr1Echo, INPUT);
 
-  // attach the interrupt function to the interrupt pin
-  attachInterrupt(digitalPinToInterrupt(2), pulseCounter1, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(3), pulseCounter2, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(18), receiver, CHANGE);
+  // attach the   function to the interrupt pin
+  attachInterrupt(digitalPinToInterrupt(usr1Echo), pulseCounter1, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(usr2Echo), pulseCounter2, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(syncIn), receiver, CHANGE);
 
 }
 
@@ -101,10 +106,10 @@ void loop() {
 // interrupt function to count the pulse width - left receiver
 void pulseCounter1() {
   
-      if (digitalRead(2) == HIGH) {    
+      if (digitalRead(usr1Echo) == HIGH) {    
           pulseStart1 = micros();
       }
-      else if (digitalRead(2) == LOW) {
+      else if (digitalRead(usr1Echo) == LOW) {
           pulseEnd1 = micros();
           distance1 = pulseEnd1 - pulseStart1;             // distance between rising and falling edge
               
@@ -114,10 +119,10 @@ void pulseCounter1() {
 // interrupt function to count the pulse width - right receiver
 void pulseCounter2() {
   
-      if (digitalRead(3) == HIGH) {    
+      if (digitalRead(usr2Echo) == HIGH) {    
           pulseStart2 = micros();
       }
-      else if (digitalRead(3) == LOW) {
+      else if (digitalRead(usr2Echo) == LOW) {
           pulseEnd2 = micros();
           distance2 = pulseEnd2 - pulseStart2;             // distance between rising and falling edge
               
@@ -127,18 +132,18 @@ void pulseCounter2() {
 
 void receiver () {
   // trigger UltrasonicS
-  if (digitalRead(18) == LOW) {
-      digitalWrite(7, LOW);
-      digitalWrite(7, HIGH);
+  if (digitalRead(syncIn) == LOW) {
+      digitalWrite(Usr1Trig, LOW);
+      digitalWrite(Usr1Trig, HIGH);
       delayMicroseconds(15);
-      digitalWrite(7, LOW);
+      digitalWrite(Usr1Trig, LOW);
   }
 
-  else if(digitalRead(18) == HIGH) {
-      digitalWrite(8, LOW);
-      digitalWrite(8, HIGH);
+  else if(digitalRead(syncIn) == HIGH) {
+      digitalWrite(Usr2Trig, LOW);
+      digitalWrite(Usr2Trig, HIGH);
       delayMicroseconds(15);
-      digitalWrite(8, LOW);
+      digitalWrite(Usr2Trig, LOW);
   }
 }
 

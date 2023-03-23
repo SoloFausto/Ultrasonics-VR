@@ -1,0 +1,1 @@
+### This SLIP OSC to UDP OSC bridge is copied directly from Pieter P's "Projects" repository with some minor modifications
